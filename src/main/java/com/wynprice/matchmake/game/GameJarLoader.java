@@ -1,15 +1,13 @@
 package com.wynprice.matchmake.game;
 
-import com.sun.jndi.toolkit.url.Uri;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -55,10 +53,10 @@ public class GameJarLoader {
                 properties.load(zip.getInputStream(entry));
                 String gameClass = properties.getProperty("game-class");
                 if(gameClass == null) {
-                    throw new IOException("Unable to find property game-class");
+                    throw new IOException("Unable to find property game-class in matchmake.properties");
                 }
                 log.info("Added Game '{}' To Roster", fileName);
-                this.entries.add(new GameJarEntry(file.toURI().toURL(), gameClass));
+                this.entries.add(new GameJarEntry(file.toURI().toURL(), gameClass, fileName));
             } catch (IOException e) {
                 log.error("Unable to read file:", e);
             }
@@ -69,6 +67,7 @@ public class GameJarLoader {
     }
 
     public void loadAll(GameServer server) {
+        log.info("Started loading roster of {}.", Arrays.toString(this.entries.stream().map(GameJarEntry::getFileName).toArray()));
         if(this.state == State.ACTIVE) {
             log.error("Tried to load the games after loading has finished", new IOException());
             return;
@@ -77,21 +76,59 @@ public class GameJarLoader {
 
         try (URLClassLoader loader = new URLClassLoader(this.entries.stream().map(GameJarEntry::getJarURL).toArray(URL[]::new), GameJarLoader.class.getClassLoader())) {
             for (GameJarEntry entry : this.entries) {
-                Class<?> entryClass = Class.forName(entry.getMainClass(), true, loader);
-                Method createGameMethod = entryClass.getMethod("createGame", GameServer.class);
-                log.info(createGameMethod.invoke(null, server));
+                this.createInstance(server, entry, loader).ifPresent(server.getGameInstances()::add);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            log.error("Error in reading game entries", e);
         }
+        log.info("Finished loading jars. End roster is {}.", Arrays.toString(server.getGameInstances().stream().map(GameInstance::getGameName).toArray()));
         this.entries.clear();
+    }
+
+    private Optional<GameInstance> createInstance(GameServer server, GameJarEntry entry, ClassLoader loader) {
+        Class<?> entryClass;
+        try {
+            entryClass = Class.forName(entry.getMainClass(), true, loader);
+        } catch (ClassNotFoundException e) {
+            log.error("Unable to find class " + entry.getMainClass() + " in jar " + entry.getJarURL().getPath(), e);
+            return Optional.empty();
+        }
+
+        Method createGameMethod;
+        try {
+            createGameMethod = entryClass.getMethod("createGame", GameServer.class);
+            if(!Modifier.isStatic(createGameMethod.getModifiers())) {
+                log.error("Method createGame in class " + entry.getMainClass() + " must be static.");
+                return Optional.empty();
+            }
+        } catch (NoSuchMethodException e) {
+            log.error("Could not find method `static createGame(GameServer)` in class " + entry.getMainClass() + ". Please refer to the specification for more details", e);
+            return Optional.empty();
+        }
+
+        Object result;
+        try {
+            result = createGameMethod.invoke(null, server);
+        } catch (IllegalAccessException e) {
+            log.error("Unable to access createGame method. Is it public and static?", e);
+            return Optional.empty();
+        } catch (InvocationTargetException e) {
+            log.error(e);
+            return Optional.empty();
+        }
+
+        if(result instanceof GameInstance) {
+            return Optional.of((GameInstance) result);
+        } else {
+            log.error("createGame result returned an object of class: " + result.getClass() + " which does not extend GameInstance");
+            return Optional.empty();
+        }
     }
 
 
     private enum State {
         LOADING_JARS,
-        ACTIVE;
-
+        ACTIVE
     }
 
 }

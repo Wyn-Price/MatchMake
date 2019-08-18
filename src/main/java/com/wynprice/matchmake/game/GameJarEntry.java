@@ -8,4 +8,5 @@ import java.net.URL;
 public class GameJarEntry {
     private final URL jarURL;
     private final String mainClass;
+    private final String fileName;
 }

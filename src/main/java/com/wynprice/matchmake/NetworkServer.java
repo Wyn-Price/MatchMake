@@ -1,9 +1,11 @@
 package com.wynprice.matchmake;
 
+import com.wynprice.matchmake.game.GameServer;
+import com.wynprice.matchmake.game.User;
 import com.wynprice.matchmake.netty.NetworkDataDecoder;
 import com.wynprice.matchmake.netty.NetworkDataEncoder;
 import com.wynprice.matchmake.netty.NetworkHandler;
-import com.wynprice.matchmake.netty.PacketDirection;
+import com.wynprice.matchmake.netty.NetworkSide;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -16,11 +18,14 @@ import lombok.Getter;
 @Getter
 public class NetworkServer {
 
+    private final GameServer server;
     private ChannelFuture endpoint;
-    private NetworkHandler handler;//TODO: this is per-client, so this needs to be on the user class
+
+    public NetworkServer(GameServer server) {
+        this.server = server;
+    }
 
     public void start(int port) {
-        this.handler = new NetworkHandler(PacketDirection.TO_CLIENT);
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         this.endpoint = new ServerBootstrap()
@@ -28,14 +33,20 @@ public class NetworkServer {
                 .childHandler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
+                        NetworkHandler handler = new NetworkHandler(NetworkSide.SERVERSIDE);
+                        new User(NetworkServer.this.server, handler);
                         ch.pipeline()
                                 .addLast("decoder", new NetworkDataDecoder())
                                 .addLast("encoder", new NetworkDataEncoder())
-                                .addLast("handler", NetworkServer.this.handler);
+                                .addLast("handler", handler);
                     }
                 })
                 .group(bossGroup, workerGroup)
                 .bind(port).syncUninterruptibly();
+    }
+
+    public void stopSever() {
+        this.endpoint.channel().close().syncUninterruptibly();
     }
 
 }
