@@ -16,8 +16,8 @@ public class MainTest {
 
     private static void setupServer(int port) {
         server = new GameServer(port);
-        server.getGameInstances().add(new GameInstanceOne());
-        server.getGameInstances().add(new GameInstanceTwo());
+        server.addGameInstance(new GameInstanceOne());
+        server.addGameInstance(new GameInstanceTwo());
     }
 
     private static void createSysInClient(int port) {

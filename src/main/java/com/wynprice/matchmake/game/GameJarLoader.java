@@ -76,7 +76,7 @@ public class GameJarLoader {
 
         try (URLClassLoader loader = new URLClassLoader(this.entries.stream().map(GameJarEntry::getJarURL).toArray(URL[]::new), GameJarLoader.class.getClassLoader())) {
             for (GameJarEntry entry : this.entries) {
-                this.createInstance(server, entry, loader).ifPresent(server.getGameInstances()::add);
+                this.createInstance(server, entry, loader).ifPresent(server::addGameInstance);
             }
         } catch (IOException e) {
             log.error("Error in reading game entries", e);

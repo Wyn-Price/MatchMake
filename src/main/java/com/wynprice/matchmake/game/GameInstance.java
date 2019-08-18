@@ -3,14 +3,21 @@ package com.wynprice.matchmake.game;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Value;
+import lombok.extern.log4j.Log4j2;
 
+import java.util.ArrayDeque;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
 
 @Getter
+@Log4j2
 public abstract class GameInstance {
 
+    @Getter(AccessLevel.NONE) private final Queue<Runnable> scheduledTasks = new ArrayDeque<>();
+
+    private final GameTimer timer = new GameTimer();
     @Getter(AccessLevel.NONE) private final Set<User> users = new HashSet<>();
 
     private int maxPlayers = 50;
@@ -18,7 +25,7 @@ public abstract class GameInstance {
     private String gameDescription = "Unset Game Description";
 
 
-    //Per ms
+    //Called once per 10 ms
     public abstract void tick();
 
     public boolean tryAddUser(User user, Consumer<String> rejectionReason) {
@@ -34,12 +41,32 @@ public abstract class GameInstance {
         return this.onUserAdd(user, rejectionReason);
     }
 
+    public void scheduleTask(Runnable runnable) {
+        this.scheduledTasks.add(runnable);
+    }
+
     public boolean onUserAdd(User user, Consumer<String> rejectionReason) {
         return true;
     }
 
     public GameSyncedData createSyncData(int id) {
         return new GameSyncedData(this.getGameName(), this.getGameDescription(), id, this.getMaxPlayers(), this.users.size());
+    }
+
+    public void startInstanceTicking() {
+        log.info("Server Thread Started");
+
+        while(true) {
+            this.timer.update();
+            for (int i = 0; i < this.timer.getTicks(); i++) {
+                synchronized (this.scheduledTasks) {
+                    while(!this.scheduledTasks.isEmpty()) {
+                        this.scheduledTasks.poll().run();
+                    }
+                }
+                this.tick();
+            }
+        }
     }
 
     @Value
