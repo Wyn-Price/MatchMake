@@ -64,6 +64,10 @@ public abstract class GameInstance {
         return new GameSyncedData(this.getGameName(), this.getGameDescription(), id, this.getMaxPlayers(), this.users.stream().map(User::getUserName).limit(5).toArray(String[]::new));
     }
 
+    public Set<User> getUsers() {
+        return Collections.unmodifiableSet(this.users);
+    }
+
     public void startInstanceTicking() {
         log.info("Server Thread Started");
 

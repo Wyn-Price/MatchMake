@@ -42,7 +42,7 @@ public class PacketJoinServer {
         user.setUserName(data.username);
         GameInstance instance = user.getServer().getGameInstances().get(data.serverID);
         if(instance.tryAddUser(user, reason -> user.getHandler().sendPacket(new PacketRejectionReason(reason)))) {
-            log.info("User {} added to server: {}", user.getUserName(), instance);
+            log.info("User: '{}' added to server: '{}'", user.getUserName(), instance.getGameName());
             user.getHandler().sendPacket(new PacketServerAcceptUser());
             user.getHandler().setConnectionState(ConnectionState.PLAYING);
         }

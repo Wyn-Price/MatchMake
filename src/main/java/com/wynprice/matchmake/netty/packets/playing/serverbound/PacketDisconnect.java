@@ -17,7 +17,7 @@ public class PacketDisconnect {
     }
 
     public static void handle(User user, PacketDisconnect data) {
-        log.info("{} disconnected from server {}", user.getUserName(), user.getInstance().getGameName());
+        log.info("User: '{}' disconnected from server '{}'", user.getUserName(), user.getInstance().getGameName());
         user.getInstance().disconnect(user, log::error);
         user.getHandler().sendPacket(new PacketAcceptDisconnect());
         user.getHandler().setConnectionState(ConnectionState.HANDSHAKING);

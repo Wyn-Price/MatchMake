@@ -10,6 +10,8 @@ import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketJoinServ
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketPing;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketRequestGameData;
 import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketAcceptDisconnect;
+import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketSendChat;
+import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketClientSayChat;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketDisconnect;
 import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketSendInstanceData;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketRequestInstanceData;
@@ -53,6 +55,8 @@ public enum ConnectionState {
         PLAYING.registerPacket(PacketSendInstanceData.class, PacketSendInstanceData::encode, PacketSendInstanceData::decode, PacketSendInstanceData::handle);
         PLAYING.registerPacket(PacketDisconnect.class, PacketDisconnect::encode, PacketDisconnect::decode, PacketDisconnect::handle);
         PLAYING.registerPacket(PacketAcceptDisconnect.class, PacketAcceptDisconnect::encode, PacketAcceptDisconnect::decode, PacketAcceptDisconnect::handle);
+        PLAYING.registerPacket(PacketClientSayChat.class, PacketClientSayChat::encode, PacketClientSayChat::decode, PacketClientSayChat::handle);
+        PLAYING.registerPacket(PacketSendChat.class, PacketSendChat::encode, PacketSendChat::decode, PacketSendChat::handle);
     }
 
 }

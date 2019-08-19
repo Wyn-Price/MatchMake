@@ -6,6 +6,8 @@ import com.wynprice.matchmake.netty.*;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketJoinServer;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketPing;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketRequestGameData;
+import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketSendChat;
+import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketClientSayChat;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketDisconnect;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketRequestInstanceData;
 import io.netty.bootstrap.Bootstrap;
@@ -64,6 +66,7 @@ public class TestClient {
     }
 
     private void processCommand(String command) {
+        String[] splitIn = command.split(" ");
         if(command.equals("server data")) {
             this.user.getHandler().sendPacket(new PacketRequestGameData());
         }
@@ -72,8 +75,8 @@ public class TestClient {
             this.user.getHandler().sendPacket(new PacketPing());
         }
         if(command.startsWith("join")) {
-            String id = command.split(" ")[1];
-            String username = command.split(" ")[2];
+            String id = splitIn[1];
+            String username = splitIn[2];
 
             this.user.setUserName(username);
             this.user.getHandler().sendPacket(new PacketJoinServer(Integer.parseInt(id), username));
@@ -85,6 +88,12 @@ public class TestClient {
 
         if(command.equals("disconnect")) {
             this.user.getHandler().sendPacket(new PacketDisconnect());
+        }
+
+        if(command.startsWith("say")) {
+            String[] arr = new String[splitIn.length - 1];
+            System.arraycopy(splitIn, 1, arr, 0, arr.length);
+            this.user.getHandler().sendPacket(new PacketClientSayChat(String.join(" ", arr)));
         }
     }
 
