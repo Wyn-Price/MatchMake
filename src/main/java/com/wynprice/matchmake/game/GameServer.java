@@ -3,6 +3,7 @@ package com.wynprice.matchmake.game;
 import com.wynprice.matchmake.NetworkServer;
 import lombok.Getter;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,7 +23,12 @@ public class GameServer {
 
 
     public void addGameInstance(GameInstance instance) {
+        this.gameInstances.add(instance);
         new Thread(instance::startInstanceTicking, "Game Instance (" + instance.getGameName() + ") Thread").start();
+    }
+
+    public List<GameInstance> getGameInstances() {
+        return Collections.unmodifiableList(this.gameInstances);
     }
 
     public GameInstance.GameSyncedData[] createInstances() {
