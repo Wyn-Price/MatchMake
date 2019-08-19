@@ -2,11 +2,14 @@ package com.wynprice.matchmake.netty.packets.handshake.clientbound;
 
 import com.wynprice.matchmake.game.GameInstance;
 import com.wynprice.matchmake.game.User;
+import com.wynprice.matchmake.util.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.stream.IntStream;
+
+import static com.wynprice.matchmake.util.ByteBufUtils.writeString;
 
 @RequiredArgsConstructor
 public class PacketSendGameData {
@@ -18,16 +21,16 @@ public class PacketSendGameData {
     public static void encode(PacketSendGameData data, ByteBuf buf) {
         buf.writeInt(data.data.length);
         for (GameInstance.GameSyncedData datum : data.data) {
-            buf.writeInt(datum.getGameName().length());
-            buf.writeCharSequence(datum.getGameName(), CHARSET);
-
-            buf.writeInt(datum.getGameDescription().length());
-            buf.writeCharSequence(datum.getGameDescription(), CHARSET);
+            writeString(datum.getGameName(), buf);
+            writeString(datum.getGameDescription(), buf);
 
             buf.writeInt(datum.getId());
-
             buf.writeInt(datum.getMaxUsers());
-            buf.writeInt(datum.getCurrentUsers());
+
+            buf.writeShort(datum.getCurrentUsers().length);
+            for (String user : datum.getCurrentUsers()) {
+                writeString(user, buf);
+            }
         }
     }
 
@@ -35,11 +38,11 @@ public class PacketSendGameData {
         GameInstance.GameSyncedData[] data = new GameInstance.GameSyncedData[buf.readInt()];
         for (int i = 0; i < data.length; i++) {
             data[i] = new GameInstance.GameSyncedData(
-                    buf.readCharSequence(buf.readInt(), CHARSET).toString(),
-                    buf.readCharSequence(buf.readInt(), CHARSET).toString(),
+                    ByteBufUtils.readString(buf),
+                    ByteBufUtils.readString(buf),
                     buf.readInt(),
                     buf.readInt(),
-                    buf.readInt()
+                    IntStream.range(0, buf.readInt()).mapToObj(_o -> ByteBufUtils.readString(buf)).toArray(String[]::new)
             );
         }
         return new PacketSendGameData(data);
@@ -51,7 +54,7 @@ public class PacketSendGameData {
             System.out.println("ID:    " + datum.getId());
             System.out.println("Name:  " + datum.getGameName());
             System.out.println("Desc:  " + datum.getGameDescription());
-            System.out.println("Users: " + datum.getCurrentUsers() + "/" + datum.getMaxUsers());
+            System.out.println("Users: " + datum.getCurrentUsers().length + "/" + datum.getMaxUsers() + (datum.getCurrentUsers().length != 0 ? " (" + String.join(", ", datum.getCurrentUsers()) + ")" : ""));
             System.out.println("--------------------------------");
         }
     }

@@ -74,7 +74,11 @@ public class TestClient {
         }
         if(command.startsWith("join")) {
             String id = command.split(" ")[1];
-            this.user.getHandler().sendPacket(new PacketJoinServer(Integer.parseInt(id)));
+            String username = command.split(" ")[2];
+
+            this.user.setUserName(username);
+
+            this.user.getHandler().sendPacket(new PacketJoinServer(Integer.parseInt(id), username));
         }
     }
 

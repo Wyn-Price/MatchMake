@@ -50,7 +50,7 @@ public abstract class GameInstance {
     }
 
     public GameSyncedData createSyncData(int id) {
-        return new GameSyncedData(this.getGameName(), this.getGameDescription(), id, this.getMaxPlayers(), this.users.size());
+        return new GameSyncedData(this.getGameName(), this.getGameDescription(), id, this.getMaxPlayers(), this.users.stream().map(User::getUserName).limit(5).toArray(String[]::new));
     }
 
     public void startInstanceTicking() {
@@ -75,6 +75,6 @@ public abstract class GameInstance {
         private final String gameDescription;
         private final int id;
         private final int maxUsers;
-        private final int currentUsers;
+        private final String[] currentUsers;
     }
 }

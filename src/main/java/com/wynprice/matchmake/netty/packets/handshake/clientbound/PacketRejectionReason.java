@@ -1,6 +1,7 @@
 package com.wynprice.matchmake.netty.packets.handshake.clientbound;
 
 import com.wynprice.matchmake.game.User;
+import com.wynprice.matchmake.util.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import lombok.RequiredArgsConstructor;
 
@@ -13,12 +14,11 @@ public class PacketRejectionReason {
     private final String reason;
 
     public static void encode(PacketRejectionReason data, ByteBuf buf) {
-        buf.writeInt(data.reason.length());
-        buf.writeCharSequence(data.reason, CHARSET);
+        ByteBufUtils.writeString(data.reason, buf);
     }
 
     public static PacketRejectionReason decode(ByteBuf buf) {
-        return new PacketRejectionReason(buf.readCharSequence(buf.readInt(), CHARSET).toString());
+        return new PacketRejectionReason(ByteBufUtils.readString(buf));
     }
 
     public static void handle(User user, PacketRejectionReason data) {
