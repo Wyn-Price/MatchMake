@@ -6,46 +6,38 @@ import com.wynprice.matchmake.util.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import lombok.RequiredArgsConstructor;
 
-import java.nio.charset.Charset;
 import java.util.stream.IntStream;
-
-import static com.wynprice.matchmake.util.ByteBufUtils.writeString;
 
 @RequiredArgsConstructor
 public class PacketSendGameData {
-
-    private static final Charset CHARSET = Charset.forName("UTF-8");
 
     private final GameInstance.GameSyncedData[] data;
 
     public static void encode(PacketSendGameData data, ByteBuf buf) {
         buf.writeInt(data.data.length);
         for (GameInstance.GameSyncedData datum : data.data) {
-            writeString(datum.getGameName(), buf);
-            writeString(datum.getGameDescription(), buf);
+            ByteBufUtils.writeString(datum.getGameName(), buf);
+            ByteBufUtils.writeString(datum.getGameDescription(), buf);
 
             buf.writeInt(datum.getId());
             buf.writeInt(datum.getMaxUsers());
 
             buf.writeShort(datum.getCurrentUsers().length);
             for (String user : datum.getCurrentUsers()) {
-                writeString(user, buf);
+                ByteBufUtils.writeString(user, buf);
             }
         }
     }
 
     public static PacketSendGameData decode(ByteBuf buf) {
-        GameInstance.GameSyncedData[] data = new GameInstance.GameSyncedData[buf.readInt()];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = new GameInstance.GameSyncedData(
-                    ByteBufUtils.readString(buf),
-                    ByteBufUtils.readString(buf),
-                    buf.readInt(),
-                    buf.readInt(),
-                    IntStream.range(0, buf.readInt()).mapToObj(_o -> ByteBufUtils.readString(buf)).toArray(String[]::new)
-            );
-        }
-        return new PacketSendGameData(data);
+        return new PacketSendGameData(
+                IntStream.range(0, buf.readInt()).mapToObj(unused ->
+                        new GameInstance.GameSyncedData(
+                                ByteBufUtils.readString(buf), ByteBufUtils.readString(buf), buf.readInt(), buf.readInt(),
+                                IntStream.range(0, buf.readShort()).mapToObj(unused1 -> ByteBufUtils.readString(buf)).toArray(String[]::new)
+                        )
+                ).toArray(GameInstance.GameSyncedData[]::new)
+        );
     }
 
     public static void handle(User user, PacketSendGameData data) {

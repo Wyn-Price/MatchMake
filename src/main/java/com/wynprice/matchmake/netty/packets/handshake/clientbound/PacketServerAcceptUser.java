@@ -15,6 +15,6 @@ public class PacketServerAcceptUser {
 
     public static void handle(User user, PacketServerAcceptUser data) {
         System.out.println("Server Accepted User");
-//        user.getHandler().setConnectionState(ConnectionState.PLAYING);
+        user.getHandler().setConnectionState(ConnectionState.PLAYING);
     }
 }

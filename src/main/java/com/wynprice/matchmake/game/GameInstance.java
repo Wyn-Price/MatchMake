@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Getter
@@ -34,11 +31,25 @@ public abstract class GameInstance {
             return false;
         }
 
+        if (this.users.stream().map(User::getUserName).anyMatch(s -> Objects.equals(s, user.getUserName()))) {
+            rejectionReason.accept("Username " + user.getUserName() + " is already taken. Please pick another one");
+            return false;
+        }
+
         if(!this.users.add(user)) {
             rejectionReason.accept("Client already in server?");
             return false;
         }
+
+        user.setInstance(this);
         return this.onUserAdd(user, rejectionReason);
+    }
+
+    public void disconnect(User user, Consumer<String> errorReason) {
+        if(!this.users.remove(user)) {
+            errorReason.accept("User wasn't in the server? This should't be possible");
+        }
+        user.setInstance(new UserPurgatory(user));
     }
 
     public void scheduleTask(Runnable runnable) {

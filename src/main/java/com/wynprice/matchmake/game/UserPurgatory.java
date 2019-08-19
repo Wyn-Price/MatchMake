@@ -1,13 +1,14 @@
 package com.wynprice.matchmake.game;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.util.function.Consumer;
 
+@Log4j2
 public class UserPurgatory extends GameInstance {
 
-    private final User user;
-
     public UserPurgatory(User user) {
-        this.user = user;
+        super.tryAddUser(user, log::error);
     }
 
     @Override
@@ -21,7 +22,17 @@ public class UserPurgatory extends GameInstance {
     }
 
     @Override
-    public boolean onUserAdd(User user, Consumer<String> rejectionReason) {
+    public String getGameName() {
+        return "Internal Purgatory";
+    }
+
+    @Override
+    public String getGameDescription() {
+        return "User is not yet in a game";
+    }
+
+    @Override
+    public boolean tryAddUser(User user, Consumer<String> rejectionReason) {
         rejectionReason.accept("Should not try and add a user to purgatory");
         return false;
     }

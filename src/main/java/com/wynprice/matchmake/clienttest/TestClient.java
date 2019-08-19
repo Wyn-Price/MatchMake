@@ -2,13 +2,12 @@ package com.wynprice.matchmake.clienttest;
 
 import com.wynprice.matchmake.game.GameServer;
 import com.wynprice.matchmake.game.User;
-import com.wynprice.matchmake.netty.NetworkDataDecoder;
-import com.wynprice.matchmake.netty.NetworkDataEncoder;
-import com.wynprice.matchmake.netty.NetworkHandler;
-import com.wynprice.matchmake.netty.NetworkSide;
+import com.wynprice.matchmake.netty.*;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketJoinServer;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketPing;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketRequestGameData;
+import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketDisconnect;
+import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketRequestInstanceData;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -77,8 +76,15 @@ public class TestClient {
             String username = command.split(" ")[2];
 
             this.user.setUserName(username);
-
             this.user.getHandler().sendPacket(new PacketJoinServer(Integer.parseInt(id), username));
+        }
+
+        if(command.equals("instance data")) {
+            this.user.getHandler().sendPacket(new PacketRequestInstanceData());
+        }
+
+        if(command.equals("disconnect")) {
+            this.user.getHandler().sendPacket(new PacketDisconnect());
         }
     }
 

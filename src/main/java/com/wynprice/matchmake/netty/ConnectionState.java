@@ -9,6 +9,10 @@ import com.wynprice.matchmake.netty.packets.handshake.clientbound.PacketServerAc
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketJoinServer;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketPing;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketRequestGameData;
+import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketAcceptDisconnect;
+import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketDisconnect;
+import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketSendInstanceData;
+import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketRequestInstanceData;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
@@ -44,6 +48,11 @@ public enum ConnectionState {
         HANDSHAKING.registerPacket(PacketJoinServer.class, PacketJoinServer::encode, PacketJoinServer::decode, PacketJoinServer::handle);
         HANDSHAKING.registerPacket(PacketRejectionReason.class, PacketRejectionReason::encode, PacketRejectionReason::decode, PacketRejectionReason::handle);
         HANDSHAKING.registerPacket(PacketServerAcceptUser.class, PacketServerAcceptUser::encode, PacketServerAcceptUser::decode, PacketServerAcceptUser::handle);
+
+        PLAYING.registerPacket(PacketRequestInstanceData.class, PacketRequestInstanceData::encode, PacketRequestInstanceData::decode, PacketRequestInstanceData::handle);
+        PLAYING.registerPacket(PacketSendInstanceData.class, PacketSendInstanceData::encode, PacketSendInstanceData::decode, PacketSendInstanceData::handle);
+        PLAYING.registerPacket(PacketDisconnect.class, PacketDisconnect::encode, PacketDisconnect::decode, PacketDisconnect::handle);
+        PLAYING.registerPacket(PacketAcceptDisconnect.class, PacketAcceptDisconnect::encode, PacketAcceptDisconnect::decode, PacketAcceptDisconnect::handle);
     }
 
 }
