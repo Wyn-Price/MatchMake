@@ -26,7 +26,7 @@ public abstract class GameInstance {
     public abstract void tick();
 
     public boolean tryAddUser(User user, Consumer<String> rejectionReason) {
-        if(this.users.size() >= this.maxPlayers) {
+        if(this.users.size() >= this.getMaxPlayers()) {
             rejectionReason.accept("Server Full!");
             return false;
         }
