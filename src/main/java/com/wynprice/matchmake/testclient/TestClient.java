@@ -97,6 +97,10 @@ public class TestClient {
             System.arraycopy(splitIn, 1, arr, 0, arr.length);
             this.user.getHandler().sendPacket(new PacketClientSayChat(String.join(" ", arr)));
         }
+
+        if(command.equals("state")) {
+            System.out.println(this.user.getHandler().getActiveChannel().attr(ClientNetworkHandler.CLIENT_CONNECTION_STATE_ATTRIBUTE_KEY).get());
+        }
     }
 
     private class ClientUser extends User {
