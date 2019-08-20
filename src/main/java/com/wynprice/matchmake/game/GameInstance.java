@@ -1,29 +1,23 @@
 package com.wynprice.matchmake.game;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-@Getter
 @Log4j2
 public abstract class GameInstance {
 
-    @Getter(AccessLevel.NONE) private final Queue<Runnable> scheduledTasks = new ArrayDeque<>();
+    private final Queue<Runnable> scheduledTasks = new ArrayDeque<>();
 
     private final GameTimer timer = new GameTimer();
-    @Getter(AccessLevel.NONE) private final Set<User> users = new HashSet<>();
-
-    private int maxPlayers = 50;
-    private String gameName = "Untitled Game";
-    private String gameDescription = "Unset Game Description";
-
+    private final Set<User> users = new HashSet<>();
 
     //Called once per 10 ms
     public abstract void tick();
+
+    public abstract void clientDataPacket(int dataID, byte[] data);
 
     public boolean tryAddUser(User user, Consumer<String> rejectionReason) {
         if(this.users.size() >= this.getMaxPlayers()) {
@@ -68,10 +62,24 @@ public abstract class GameInstance {
         return Collections.unmodifiableSet(this.users);
     }
 
-    public abstract void clientDataPacket(int dataID, byte[] data);
+    public GameTimer getTimer() {
+        return this.timer;
+    }
+
+    public int getMaxPlayers() {
+        return 50;
+    }
+
+    public String getGameName() {
+        return "Untitled Game";
+    }
+
+    public String getGameDescription() {
+        return "Unset Game Description";
+    }
 
     public void startInstanceTicking() {
-        log.info("Server Thread Started");
+        log.info("Started Game Instance Ticking Thread");
 
         while(true) {
             this.timer.update();
@@ -91,7 +99,8 @@ public abstract class GameInstance {
         private final String gameName;
         private final String gameDescription;
         private final int id;
+        private final int currentUsers;
         private final int maxUsers;
-        private final String[] currentUsers;
+        private final String[] currentUsernames;
     }
 }
