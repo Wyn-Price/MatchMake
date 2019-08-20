@@ -1,4 +1,4 @@
-package com.wynprice.matchmake.netty;
+package com.wynprice.matchmake.testclient.netty;
 
 import com.wynprice.matchmake.game.User;
 import com.wynprice.matchmake.netty.packets.BasePacketEntry;
@@ -28,7 +28,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public enum ConnectionState {
+//This is an exact copy of ConnectionState, but with the outbound and inbound packets switched.
+public enum ClientConnectionState {
     HANDSHAKING,
     PLAYING;
 
@@ -78,24 +79,24 @@ public enum ConnectionState {
     }
 
     static {
-        HANDSHAKING.registerInboundPacket(0, PacketRequestGameData.class, emptyDecoder(PacketRequestGameData::new), PacketRequestGameData::handle);
-        HANDSHAKING.registerInboundPacket(1, PacketPing.class, emptyDecoder(PacketPing::new), PacketPing::handle);
-        HANDSHAKING.registerInboundPacket(2, PacketJoinServer.class, PacketJoinServer::decode, PacketJoinServer::handle);
+        HANDSHAKING.registerOutboundPacket(0, PacketRequestGameData.class, emptyEncoder());
+        HANDSHAKING.registerOutboundPacket(1, PacketPing.class, emptyEncoder());
+        HANDSHAKING.registerOutboundPacket(2, PacketJoinServer.class, ClientPacketEncoder::encodeJoinServer);
 
-        HANDSHAKING.registerOutboundPacket(0, PacketSendGameData.class, PacketSendGameData::encode);
-        HANDSHAKING.registerOutboundPacket(1, PacketPong.class, emptyEncoder());
-        HANDSHAKING.registerOutboundPacket(2, PacketRejectionReason.class, PacketRejectionReason::encode);
-        HANDSHAKING.registerOutboundPacket(3, PacketServerAcceptUser.class, emptyEncoder());
+        HANDSHAKING.registerInboundPacket(0, PacketSendGameData.class, ClientPacketDecoder::decodeSendData, ClientPacketHandler::handleSentGameData);
+        HANDSHAKING.registerInboundPacket(1, PacketPong.class, emptyDecoder(PacketPong::new), ClientPacketHandler::handlePong);
+        HANDSHAKING.registerInboundPacket(2, PacketRejectionReason.class, ClientPacketDecoder::decodeRejectionReason, ClientPacketHandler::handleRejectionReason);
+        HANDSHAKING.registerInboundPacket(3, PacketServerAcceptUser.class, emptyDecoder(PacketServerAcceptUser::new), ClientPacketHandler::handleAcceptUser);
 
-        PLAYING.registerInboundPacket(0, PacketRequestInstanceData.class, emptyDecoder(PacketRequestInstanceData::new), PacketRequestInstanceData::handle);
-        PLAYING.registerInboundPacket(1, PacketDisconnect.class, emptyDecoder(PacketDisconnect::new), PacketDisconnect::handle);
-        PLAYING.registerInboundPacket(2, PacketClientSayChat.class, PacketClientSayChat::decode, PacketClientSayChat::handle);
-        PLAYING.registerInboundPacket(3, PacketClientEventHappen.class, PacketClientEventHappen::decode, PacketClientEventHappen::handle);
+        PLAYING.registerOutboundPacket(0, PacketRequestInstanceData.class, emptyEncoder());
+        PLAYING.registerOutboundPacket(1, PacketDisconnect.class, emptyEncoder());
+        PLAYING.registerOutboundPacket(2, PacketClientSayChat.class, ClientPacketEncoder::encodeSayChat);
+        PLAYING.registerOutboundPacket(3, PacketClientEventHappen.class, ClientPacketEncoder::encodeEventHappen);
 
-        PLAYING.registerOutboundPacket(0, PacketSendInstanceData.class, PacketSendInstanceData::encode);
-        PLAYING.registerOutboundPacket(1, PacketAcceptDisconnect.class, emptyEncoder());
-        PLAYING.registerOutboundPacket(2, PacketSendChat.class, PacketSendChat::encode);
-        PLAYING.registerOutboundPacket(3, PacketServerEventHappen.class, PacketServerEventHappen::encode);
+        PLAYING.registerInboundPacket(0, PacketSendInstanceData.class, ClientPacketDecoder::decodeSendInstanceData, ClientPacketHandler::handleSentInstanceData);
+        PLAYING.registerInboundPacket(1, PacketAcceptDisconnect.class, emptyDecoder(PacketAcceptDisconnect::new), ClientPacketHandler::handleAcceptDisconnect);
+        PLAYING.registerInboundPacket(2, PacketSendChat.class, ClientPacketDecoder::decodeSendChat, ClientPacketHandler::handleChatEvent);
+        PLAYING.registerInboundPacket(3, PacketServerEventHappen.class, ClientPacketDecoder::decodeServerEvent, ClientPacketHandler::handleServerEventHappen);
     }
 
 }

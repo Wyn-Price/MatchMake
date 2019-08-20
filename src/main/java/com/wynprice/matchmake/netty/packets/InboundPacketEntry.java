@@ -8,10 +8,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 @Value
-public class PacketEntry<T> {
+public class InboundPacketEntry<T> implements BasePacketEntry {
     private final int index;
     private final Class<T> clazz;
-    private final BiConsumer<T, ByteBuf> encoder;
     private final Function<ByteBuf, T> decoder;
     private final BiConsumer<User, T> handler;
 }

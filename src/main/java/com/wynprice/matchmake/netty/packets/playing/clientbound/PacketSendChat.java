@@ -1,14 +1,12 @@
 package com.wynprice.matchmake.netty.packets.playing.clientbound;
 
-import com.wynprice.matchmake.game.User;
-import com.wynprice.matchmake.netty.ConnectionState;
 import com.wynprice.matchmake.util.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
+@Getter
 @RequiredArgsConstructor
-@Log4j2
 public class PacketSendChat {
 
     private final String user;
@@ -19,11 +17,5 @@ public class PacketSendChat {
         ByteBufUtils.writeString(data.message, buf);
     }
 
-    public static PacketSendChat decode(ByteBuf buf) {
-        return new PacketSendChat(ByteBufUtils.readString(buf), ByteBufUtils.readString(buf));
-    }
-
-    public static void handle(User user, PacketSendChat data) {
-        System.out.println(data.user + ": " + data.message);
-    }
 }
+

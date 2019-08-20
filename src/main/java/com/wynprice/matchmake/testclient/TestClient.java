@@ -1,4 +1,4 @@
-package com.wynprice.matchmake.clienttest;
+package com.wynprice.matchmake.testclient;
 
 import com.wynprice.matchmake.game.GameServer;
 import com.wynprice.matchmake.game.User;
@@ -6,10 +6,12 @@ import com.wynprice.matchmake.netty.*;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketJoinServer;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketPing;
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketRequestGameData;
-import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketSendChat;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketClientSayChat;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketDisconnect;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketRequestInstanceData;
+import com.wynprice.matchmake.testclient.netty.ClientNetworkDataDecoder;
+import com.wynprice.matchmake.testclient.netty.ClientNetworkDataEncoder;
+import com.wynprice.matchmake.testclient.netty.ClientNetworkHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -32,7 +34,7 @@ public class TestClient {
 
 
     public void start(int port) {
-        NetworkHandler handler = new NetworkHandler(NetworkSide.CLIENTSIDE);
+        NetworkHandler handler = new ClientNetworkHandler();
         this.user = new ClientUser( handler);
         this.endpoint = new Bootstrap()
                 .group(new NioEventLoopGroup())
@@ -41,8 +43,8 @@ public class TestClient {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
                         ch.pipeline()
-                                .addLast("encoder", new NetworkDataEncoder())
-                                .addLast("decoder", new NetworkDataDecoder())
+                                .addLast("encoder", new ClientNetworkDataEncoder())
+                                .addLast("decoder", new ClientNetworkDataDecoder())
                                 .addLast("handler", handler);
                     }
                 }).connect("localhost", port).syncUninterruptibly();

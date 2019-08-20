@@ -4,16 +4,14 @@ import com.wynprice.matchmake.game.User;
 import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketSendChat;
 import com.wynprice.matchmake.util.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Getter
 public class PacketClientSayChat {
 
     private final String message;
-
-    public static void encode(PacketClientSayChat data, ByteBuf buf) {
-        ByteBufUtils.writeString(data.message, buf);
-    }
 
     public static PacketClientSayChat decode(ByteBuf buf) {
         return new PacketClientSayChat(ByteBufUtils.readString(buf));

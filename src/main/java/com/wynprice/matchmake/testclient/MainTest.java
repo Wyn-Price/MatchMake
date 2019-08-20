@@ -1,10 +1,8 @@
-package com.wynprice.matchmake.clienttest;
+package com.wynprice.matchmake.testclient;
 
-import com.wynprice.matchmake.clienttest.TestClient;
-import com.wynprice.matchmake.clienttest.testinstances.GameInstanceOne;
-import com.wynprice.matchmake.clienttest.testinstances.GameInstanceTwo;
+import com.wynprice.matchmake.testclient.testinstances.GameInstanceOne;
+import com.wynprice.matchmake.testclient.testinstances.GameInstanceTwo;
 import com.wynprice.matchmake.game.GameServer;
-import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketRequestGameData;
 
 public class MainTest {
     public static GameServer server;

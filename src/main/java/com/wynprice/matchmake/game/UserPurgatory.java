@@ -36,4 +36,9 @@ public class UserPurgatory extends GameInstance {
         rejectionReason.accept("Should not try and add a user to purgatory");
         return false;
     }
+
+    @Override
+    public void clientDataPacket(int dataID, byte[] data) {
+        //Warn server of this happening?
+    }
 }

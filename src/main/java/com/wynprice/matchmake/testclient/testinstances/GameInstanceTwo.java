@@ -1,4 +1,4 @@
-package com.wynprice.matchmake.clienttest.testinstances;
+package com.wynprice.matchmake.testclient.testinstances;
 
 import com.wynprice.matchmake.game.GameInstance;
 
@@ -16,6 +16,11 @@ public class GameInstanceTwo extends GameInstance {
 
     @Override
     public void tick() {
+
+    }
+
+    @Override
+    public void clientDataPacket(int dataID, byte[] data) {
 
     }
 

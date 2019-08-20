@@ -1,7 +1,7 @@
 package com.wynprice.matchmake.netty;
 
 import com.wynprice.matchmake.game.User;
-import com.wynprice.matchmake.netty.packets.PacketEntry;
+import com.wynprice.matchmake.netty.packets.InboundPacketEntry;
 import io.netty.channel.*;
 import io.netty.util.AttributeKey;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class NetworkHandler extends SimpleChannelInboundHandler<Object> {
 
     private final Logger logger;
 
-    private Channel activeChannel;
+    @Getter private Channel activeChannel;
     @Setter @NonNull private Runnable whenReady = () -> {};
     @Setter @Getter @NonNull private User user;
     private final NetworkSide direction;
@@ -32,8 +32,8 @@ public class NetworkHandler extends SimpleChannelInboundHandler<Object> {
         this.channelRead1(ctx, msg);
     }
 
-    private <T> void channelRead1(ChannelHandlerContext ctx, T msg) {
-        PacketEntry<T> entry = ctx.channel().attr(CONNECTION_STATE_ATTRIBUTE_KEY).get().getEntry(msg);
+    protected <T> void channelRead1(ChannelHandlerContext ctx, T msg) {
+        InboundPacketEntry<T> entry = ctx.channel().attr(CONNECTION_STATE_ATTRIBUTE_KEY).get().getInboundPacket(msg);
         entry.getHandler().accept(this.user, msg);
     }
 

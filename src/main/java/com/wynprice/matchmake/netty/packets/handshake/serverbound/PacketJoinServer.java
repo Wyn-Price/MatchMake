@@ -8,27 +8,18 @@ import com.wynprice.matchmake.netty.packets.handshake.clientbound.PacketServerAc
 import com.wynprice.matchmake.util.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.nio.charset.Charset;
 
 @Log4j2
 @AllArgsConstructor
+@Getter
 public class PacketJoinServer {
-
-    private static final Charset CHARSET = Charset.forName("UTF-8");
-
     private final int serverID;
     private final String username;
 
-    public static void encode(PacketJoinServer data, ByteBuf buf) {
-        buf.writeInt(data.serverID);
-
-        buf.writeBoolean(data.username != null);
-        if(data.username != null) {
-            ByteBufUtils.writeString(data.username, buf);
-        }
-    }
 
     public static PacketJoinServer decode(ByteBuf buf) {
         return new PacketJoinServer(buf.readInt(), buf.readBoolean() ? ByteBufUtils.readString(buf) : null);
