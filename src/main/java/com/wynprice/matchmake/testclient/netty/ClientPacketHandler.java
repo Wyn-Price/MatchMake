@@ -23,7 +23,7 @@ public class ClientPacketHandler {
             System.out.println("ID:    " + datum.getId());
             System.out.println("Name:  " + datum.getGameName());
             System.out.println("Desc:  " + datum.getGameDescription());
-            System.out.println("Users: " + datum.getCurrentUsers().length + "/" + datum.getMaxUsers() + (datum.getCurrentUsers().length != 0 ? " (" + String.join(", ", datum.getCurrentUsers()) + ")" : ""));
+            System.out.println("Users: " + datum.getCurrentUsers() + "/" + datum.getMaxUsers() + (datum.getCurrentUsernames().length != 0 ? " (" + String.join(", ", datum.getCurrentUsernames()) + ")" : ""));
             System.out.println("--------------------------------");
         }
     }
@@ -48,7 +48,7 @@ public class ClientPacketHandler {
         System.out.println("ID:    " + datum.getId());
         System.out.println("Name:  " + datum.getGameName());
         System.out.println("Desc:  " + datum.getGameDescription());
-        System.out.println("Users: " + datum.getCurrentUsers().length + "/" + datum.getMaxUsers() + (datum.getCurrentUsers().length != 0 ? " (" + String.join(", ", datum.getCurrentUsers()) + ")" : ""));
+        System.out.println("Users: " + datum.getCurrentUsers() + "/" + datum.getMaxUsers() + (datum.getCurrentUsernames().length != 0 ? " (" + String.join(", ", datum.getCurrentUsernames()) + ")" : ""));
         System.out.println("--------------------------------");
     }
 

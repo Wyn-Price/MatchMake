@@ -55,7 +55,7 @@ public abstract class GameInstance {
     }
 
     public GameSyncedData createSyncData(int id) {
-        return new GameSyncedData(this.getGameName(), this.getGameDescription(), id, this.getMaxPlayers(), this.users.stream().map(User::getUserName).limit(5).toArray(String[]::new));
+        return new GameSyncedData(this.getGameName(), this.getGameDescription(), id, this.users.size(), this.getMaxPlayers(), this.users.stream().map(User::getUserName).limit(5).toArray(String[]::new));
     }
 
     public Set<User> getUsers() {

@@ -20,10 +20,11 @@ public class PacketSendGameData {
             ByteBufUtils.writeString(datum.getGameDescription(), buf);
 
             buf.writeInt(datum.getId());
+            buf.writeInt(datum.getCurrentUsers());
             buf.writeInt(datum.getMaxUsers());
 
-            buf.writeShort(datum.getCurrentUsers().length);
-            for (String user : datum.getCurrentUsers()) {
+            buf.writeShort(datum.getCurrentUsernames().length);
+            for (String user : datum.getCurrentUsernames()) {
                 ByteBufUtils.writeString(user, buf);
             }
         }

@@ -17,7 +17,7 @@ public class ClientPacketDecoder {
         return new PacketSendGameData(
                 IntStream.range(0, buf.readInt()).mapToObj(unused ->
                         new GameInstance.GameSyncedData(
-                                ByteBufUtils.readString(buf), ByteBufUtils.readString(buf), buf.readInt(), buf.readInt(),
+                                ByteBufUtils.readString(buf), ByteBufUtils.readString(buf), buf.readInt(), buf.readInt(), buf.readInt(),
                                 IntStream.range(0, buf.readShort()).mapToObj(unused1 -> ByteBufUtils.readString(buf)).toArray(String[]::new)
                         )
                 ).toArray(GameInstance.GameSyncedData[]::new)
@@ -30,7 +30,7 @@ public class ClientPacketDecoder {
 
     public static PacketSendInstanceData decodeSendInstanceData(ByteBuf buf) {
         return new PacketSendInstanceData(new GameInstance.GameSyncedData(
-                ByteBufUtils.readString(buf), ByteBufUtils.readString(buf), buf.readInt(), buf.readInt(),
+                ByteBufUtils.readString(buf), ByteBufUtils.readString(buf), buf.readInt(), buf.readInt(), buf.readInt(),
                 IntStream.range(0, buf.readShort()).mapToObj(unused1 -> ByteBufUtils.readString(buf)).toArray(String[]::new)
         ));
     }
