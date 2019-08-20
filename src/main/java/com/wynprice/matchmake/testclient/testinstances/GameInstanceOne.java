@@ -6,12 +6,12 @@ public class GameInstanceOne extends GameInstance {
 
     @Override
     public String getGameName() {
-        return "Fake Game ONe";
+        return "Dummy Game One";
     }
 
     @Override
     public String getGameDescription() {
-        return "This is a Gamemode";
+        return "This is one gamemode, with it's own rules and player limit";
     }
 
     @Override
