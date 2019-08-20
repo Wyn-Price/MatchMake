@@ -68,6 +68,8 @@ public abstract class GameInstance {
         return Collections.unmodifiableSet(this.users);
     }
 
+    public abstract void clientDataPacket(int dataID, byte[] data);
+
     public void startInstanceTicking() {
         log.info("Server Thread Started");
 
