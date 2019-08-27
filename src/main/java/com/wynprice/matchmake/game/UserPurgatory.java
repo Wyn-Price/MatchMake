@@ -7,18 +7,30 @@ import java.util.function.Consumer;
 @Log4j2
 public class UserPurgatory extends GameInstance {
 
-    public UserPurgatory(User user) {
-        super.tryAddUser(user, log::error);
+    public UserPurgatory(GameServer server) {
+        super(server);
+    }
+
+    public void userConnect(User user) {
+        user.setInstance(this);
+        this.users.add(user);
     }
 
     @Override
     public int getMaxPlayers() {
-        return 1;
+        return 0;
     }
 
     @Override
     public void tick() {
 
+    }
+
+    @Override
+    public void disconnect(User user, Consumer<String> errorReason) {
+        if(!this.users.remove(user)) {
+            errorReason.accept("User wasn't in the server? This should't be possible");
+        }
     }
 
     @Override

@@ -1,6 +1,5 @@
-package com.wynprice.matchmake.testclient.netty;
+package com.wynprice.matchmake.client.netty;
 
-import com.wynprice.matchmake.netty.NetworkHandler;
 import com.wynprice.matchmake.netty.packets.InboundPacketEntry;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

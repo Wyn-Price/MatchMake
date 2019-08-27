@@ -1,4 +1,4 @@
-package com.wynprice.matchmake.testclient.netty;
+package com.wynprice.matchmake.client.netty;
 
 import com.wynprice.matchmake.game.User;
 import com.wynprice.matchmake.netty.packets.BasePacketEntry;
@@ -20,6 +20,7 @@ import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketClientSayC
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketDisconnect;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketRequestInstanceData;
 import io.netty.buffer.ByteBuf;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +30,12 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 //This is an exact copy of ConnectionState, but with the outbound and inbound packets switched.
-public enum ClientConnectionState {
-    HANDSHAKING,
-    PLAYING;
+@RequiredArgsConstructor
+public class ClientConnectionState {
+    public static final ClientConnectionState HANDSHAKING = new ClientConnectionState("HANDSHAKING");
+    public static final ClientConnectionState PLAYING = new ClientConnectionState("PLAYING");
+
+    private final String name;
 
     private final List<OutboundPacket> outboundPackets = new ArrayList<>();
     private final List<InboundPacketEntry> inboundPackets = new ArrayList<>();
@@ -54,6 +58,26 @@ public enum ClientConnectionState {
     }
 
     @SuppressWarnings("unchecked")
+    public <T> void withInboundHandler(Class<T> objClass, BiConsumer<User, T> handler) {
+        if(this == HANDSHAKING || this == PLAYING) {
+            throw new IllegalArgumentException("Cannot mutate base handles");
+        }
+        this.inboundPackets.replaceAll(entry -> {
+            if(entry.getClazz() == objClass) {
+                return new InboundPacketEntry<T>(entry.getIndex(), entry.getClazz(), entry.getDecoder(), handler);
+            }
+            return entry;
+        });
+    }
+
+    public ClientConnectionState copy() {
+        ClientConnectionState state = new ClientConnectionState(this.name);
+        state.inboundPackets.addAll(this.inboundPackets);
+        state.outboundPackets.addAll(this.outboundPackets);
+        return state;
+    }
+
+    @SuppressWarnings("unchecked")
     public <T> InboundPacketEntry<T> getInboundPacket(T obj) {
         return (InboundPacketEntry<T>) this.getFromObj(obj, this.inboundPackets);
     }
@@ -66,9 +90,8 @@ public enum ClientConnectionState {
         return this.getEntry(e -> e.getClazz() == object.getClass(), list, "Could not find packet for class " + object.getClass());
     }
     private <T> T getEntry(Predicate<T> predicate, List<T> list, String errorMessage) {
-        return list.stream().filter(predicate).findAny().orElseThrow(() -> new IllegalArgumentException(errorMessage + " for state " + this.name()));
+        return list.stream().filter(predicate).findAny().orElseThrow(() -> new IllegalArgumentException(errorMessage + " for state " + this.name));
     }
-
 
     private static <T> Function<ByteBuf, T> emptyDecoder(Supplier<T> supplier) {
         return buff -> supplier.get();

@@ -1,12 +1,10 @@
-package com.wynprice.matchmake.testclient.netty;
+package com.wynprice.matchmake.client.netty;
 
 import com.wynprice.matchmake.netty.packets.handshake.serverbound.PacketJoinServer;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketClientEventHappen;
 import com.wynprice.matchmake.netty.packets.playing.serverbound.PacketClientSayChat;
 import com.wynprice.matchmake.util.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
-
-import java.util.function.BiConsumer;
 
 public class ClientPacketEncoder {
     public static void encodeJoinServer(PacketJoinServer data, ByteBuf buf) {

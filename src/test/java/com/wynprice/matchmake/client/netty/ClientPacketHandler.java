@@ -1,5 +1,6 @@
-package com.wynprice.matchmake.testclient.netty;
+package com.wynprice.matchmake.client.netty;
 
+import com.wynprice.matchmake.client.MatchMakeClient;
 import com.wynprice.matchmake.game.GameInstance;
 import com.wynprice.matchmake.game.User;
 import com.wynprice.matchmake.netty.ConnectionState;
@@ -11,7 +12,6 @@ import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketAcceptDisc
 import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketSendChat;
 import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketSendInstanceData;
 import com.wynprice.matchmake.netty.packets.playing.clientbound.PacketServerEventHappen;
-import com.wynprice.matchmake.testclient.TestClient;
 
 import java.util.Arrays;
 
@@ -30,7 +30,7 @@ public class ClientPacketHandler {
 
 
     public static void handlePong(User user, PacketPong data) {
-        System.out.println("Ping result: " + (System.currentTimeMillis() - TestClient.pingStart) + "ms");
+        System.out.println("Ping result: " + (System.currentTimeMillis() - MatchMakeClient.pingStart) + "ms");
     }
 
     public static void handleRejectionReason(User user, PacketRejectionReason data) {

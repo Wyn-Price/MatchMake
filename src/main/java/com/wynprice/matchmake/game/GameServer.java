@@ -8,15 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Getter
-public class GameServer {
+public class GameServer implements AutoCloseable {
 
-    public static GameServer INSTANCE;
-
+    private final UserPurgatory purgetory = new UserPurgatory(this);
     private final List<GameInstance> gameInstances = new LinkedList<>();
     private final NetworkServer server;
 
     public GameServer(int port) {
-        INSTANCE = this;
         this.server = new NetworkServer(this);
         this.server.start(port);
     }
@@ -37,5 +35,10 @@ public class GameServer {
             data[i] = this.gameInstances.get(i).createSyncData(i);
         }
         return data;
+    }
+
+    @Override
+    public void close() {
+        this.server.close();
     }
 }

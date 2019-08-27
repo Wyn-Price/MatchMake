@@ -16,7 +16,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
 
 @Getter
-public class NetworkServer {
+public class NetworkServer implements AutoCloseable {
 
     private final GameServer server;
     private ChannelFuture endpoint;
@@ -45,7 +45,8 @@ public class NetworkServer {
                 .bind(port).syncUninterruptibly();
     }
 
-    public void stopSever() {
+    @Override
+    public void close() {
         this.endpoint.channel().close().syncUninterruptibly();
     }
 

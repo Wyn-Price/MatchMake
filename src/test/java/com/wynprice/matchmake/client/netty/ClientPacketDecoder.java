@@ -1,4 +1,4 @@
-package com.wynprice.matchmake.testclient.netty;
+package com.wynprice.matchmake.client.netty;
 
 import com.wynprice.matchmake.game.GameInstance;
 import com.wynprice.matchmake.netty.packets.handshake.clientbound.PacketRejectionReason;

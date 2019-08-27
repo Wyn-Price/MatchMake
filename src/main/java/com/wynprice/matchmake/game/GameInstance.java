@@ -9,10 +9,16 @@ import java.util.function.Consumer;
 @Log4j2
 public abstract class GameInstance {
 
+    private final GameServer server;
+
     private final Queue<Runnable> scheduledTasks = new ArrayDeque<>();
 
     private final GameTimer timer = new GameTimer();
-    private final Set<User> users = new HashSet<>();
+    protected final Set<User> users = new HashSet<>();
+
+    protected GameInstance(GameServer server) {
+        this.server = server;
+    }
 
     //Called once per 10 ms
     public abstract void tick();
@@ -43,7 +49,7 @@ public abstract class GameInstance {
         if(!this.users.remove(user)) {
             errorReason.accept("User wasn't in the server? This should't be possible");
         }
-        user.setInstance(new UserPurgatory(user));
+        user.connectToPurgetory();
     }
 
     public void scheduleTask(Runnable runnable) {
