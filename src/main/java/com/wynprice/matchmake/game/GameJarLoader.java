@@ -120,7 +120,7 @@ public class GameJarLoader {
         if(result instanceof GameInstance) {
             return Optional.of((GameInstance) result);
         } else {
-            log.error("createGame result returned an object of class: " + result.getClass() + " which does not extend GameInstance");
+            log.error("createGame result returned an object of class: " + (result != null ? result.getClass() : "[null]") + " which does not extend GameInstance");
             return Optional.empty();
         }
     }
